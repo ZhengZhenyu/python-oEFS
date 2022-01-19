@@ -1,2 +1,4 @@
 working_dir: /opt/ofs-workspace
-repo_file: ../etc/openEuler.repo
+debug: True
+user_name: root
+user_passwd: openEuler

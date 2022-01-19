@@ -1,70 +1,61 @@
-import argparse
-import logging
-import json
 import os
-import subprocess
 from shutil import copy
-import yaml
+
+from pychroot import Chroot
 
 
-ROOTFS_DIR = 'rootfs'
-DNF_COMMAND = 'dnf'
-
-parser = argparse.ArgumentParser(description='clone and manipulate git repositories')
-parser.add_argument('--package-list', metavar='<package_list>',
-                    dest='package_list', required=True,
-                    help='Input file including information like package lists and target version.')
-parser.add_argument('--config-file', metavar='<config_file>',
-                    dest='config_file', required=True,
-                    help='Configuration file for the software, including working dir, number of workers etc.')
-parser.add_argument('--repo-file', metavar='<repo_file>',
-                    dest='repo_file', required=True,
-                    help='Repository file used in the rootfs.')
+RPM_INSTALLER = 'dnf'
 
 
-def parse_package_list(list_file):
-    if not list_file:
-        raise Exception
-
-    with open(list_file, 'r') as inputs:
-        input_dict = json.load(inputs)
-
-    package_list = input_dict["PackageList"]
-    return package_list
-
-
-if __name__ == '__main__':
-    parsed_args = parser.parse_args()
-    with open(parsed_args.config_file, 'r') as config_file:
-        config_options = yaml.load(config_file, Loader=yaml.SafeLoader)
-
-    if not os.path.exists(config_options['working_dir']):
-        os.makedirs(config_options['working_dir'])
-
-    # prepare an empty rootfs folder with repo file in place
-    rootfs_dir = config_options + ROOTFS_DIR
-    rootfs_repo_dir = rootfs_dir + '/etc/yum.repos.d'
-    repo_file = config_options['repo_file']
-    os.makedirs(rootfs_dir)
-    os.makedirs(rootfs_repo_dir)
-    copy(repo_file, rootfs_repo_dir)
-
+def install_rpms(dest_dir, pkg_list, verbose=False):
     # install filesystem first
-    cmd = [DNF_COMMAND, 'install', 'filesystem', '--installroot',
-           rootfs_dir, '-y']
+    cmd = [RPM_INSTALLER, 'install', 'filesystem', '--installroot',
+           dest_dir, '-y']
     os.system(' '.join(cmd))
-
-    # install the rest of packages from the pkg_list
-    pkg_list = parse_package_list(parsed_args.package_list)
 
     for pkg in pkg_list:
         # filesystem already installed, skip
         if pkg == 'filesystem':
             continue
         else:
-            cmd = [DNF_COMMAND, 'install', pkg, '--installroot',
-                   rootfs_dir, '-y']
+            print('Installing:', pkg, '...')
+            cmd = [RPM_INSTALLER, 'install', pkg, '--installroot',
+                   dest_dir, '-y']
+            if not verbose:
+                cmd.append('-q')
             os.system(' '.join(cmd))
 
-    print('rootfs generated in:\n')
-    print(rootfs_dir)
+    print('rootfs generated in: ', dest_dir)
+
+
+def prepare_init_script(source_dir, dest_dir):
+    init_file = source_dir + '/etc/init'
+    copy(init_file, dest_dir)
+
+
+def confg_rootfs(dest_dir, config_options):
+    with Chroot(dest_dir):
+        # TODO: make this configurable
+        os.system('echo "root:openEuler" | chpasswd')
+        # walk-around to avoid systemd failure
+        os.system("sed -i '/SELINUX/{s/enforcing/disabled/}' /etc/selinux/config")
+    print('Users and Selinux configuration finished in rootfs.')
+
+
+def compress_to_gz(dest_dir, work_dir):
+    orig_dir = os.getcwd()
+    os.chdir(dest_dir)
+    # run cpio command to generate rootfs.gz
+    os.system('find . | cpio -R root:root -H newc -o | gzip > ../iso/rootfs.gz')
+    os.chdir(orig_dir)
+    print('rootfs.gz generated at', work_dir)
+
+
+def make_rootfs(dest_dir, work_dir, pkg_list, base_dir, config_options, verbose=False):
+    print('making rootfs ...')
+    install_rpms(dest_dir, pkg_list, verbose)
+    prepare_init_script(base_dir, dest_dir)
+    confg_rootfs(dest_dir, config_options)
+    compress_to_gz(dest_dir, work_dir)
+
+
