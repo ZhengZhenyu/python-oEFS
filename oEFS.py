@@ -1,8 +1,9 @@
 import argparse
 import json
 import os
+import shutil
+import time
 import yaml
-from shutil import copy
 
 import rootfs_worker
 import iso_worker
@@ -31,11 +32,15 @@ def parse_package_list(list_file):
     return package_list
 
 
-def prepare_workspace(base_dir, parsed_args, config_options):
+def clean_up_dir(target_dir):
+    if os.path.exists(target_dir):
+        shutil.rmtree(target_dir)
 
-    if not os.path.exists(config_options['working_dir']):
-        os.makedirs(config_options['working_dir'])
+
+def prepare_workspace(base_dir, parsed_args, config_options):
     work_dir = config_options['working_dir']
+    clean_up_dir(work_dir)
+    os.makedirs(work_dir)
     packages = parse_package_list(parsed_args.package_list)
 
     verbose = False
@@ -46,21 +51,23 @@ def prepare_workspace(base_dir, parsed_args, config_options):
     rootfs_dir = config_options['working_dir'] + '/' + ROOTFS_DIR
     rootfs_repo_dir = rootfs_dir + '/etc/yum.repos.d'
 
-    # TODO: make this configurabe
+    # TODO: make this configurable
     repo_file = base_dir + '/etc/openEuler.repo'
 
     os.makedirs(rootfs_dir)
     os.makedirs(rootfs_repo_dir)
-    copy(repo_file, rootfs_repo_dir)
+    shutil.copy(repo_file, rootfs_repo_dir)
 
     print('Create a clean dir to hold all files required to make iso ...')
     iso_base_dir = work_dir + '/iso'
+    clean_up_dir(rootfs_dir)
     os.makedirs(iso_base_dir)
 
     return rootfs_dir, config_options['working_dir'], iso_base_dir, packages, verbose
 
 
 if __name__ == '__main__':
+    start_time = time.time()
     # parse config options and args
     parsed_args = parser.parse_args()
     with open(parsed_args.config_file, 'r') as config_file:
@@ -72,3 +79,6 @@ if __name__ == '__main__':
     iso_worker.make_iso(iso_base, base_dir)
 
     print('ISO: openEuler-test.iso generated in:', work_dir)
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print('Elapsed time: %s s' % elapsed_time)

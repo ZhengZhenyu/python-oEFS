@@ -6,7 +6,7 @@ def prepare_iso_linux(iso_base_dir, base_dir):
     # copy isolinux files to the corresponding folder
     isolinux_files = ['isolinux.bin', 'isolinux.cfg', 'ldlinux.c32']
     for file in isolinux_files:
-        full_file = base_dir + '/etc/isolinux' + file
+        full_file = base_dir + '/etc/isolinux/' + file
         copy(full_file, iso_base_dir)
 
     # copy linux kernel to the correspoding folder
