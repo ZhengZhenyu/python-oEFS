@@ -16,10 +16,13 @@ def install_rpm(dest_dir, pkg, verbose=False):
     os.system(' '.join(cmd))
 
 
-def install_rpms(dest_dir, pkg_list, verbose=False):
+def install_rpms(dest_dir, pkg_list, repo_file, rootfs_repo_dir, verbose=False):
     print('Installing RPMs ...')
     # install filesystem first
     install_rpm(dest_dir, 'filesystem', verbose)
+
+    # copy repo files again to avoid override by filesystem
+    copy(repo_file, rootfs_repo_dir)
 
     for pkg in pkg_list:
         # filesystem already installed, skip
@@ -54,9 +57,10 @@ def compress_to_gz(dest_dir, work_dir):
     print('Done! rootfs.gz generated at', work_dir + '/iso')
 
 
-def make_rootfs(dest_dir, work_dir, pkg_list, base_dir, config_options, verbose=False):
+def make_rootfs(dest_dir, work_dir, pkg_list, base_dir, config_options,
+                repo_file, rootfs_repo_dir, verbose=False):
     print('Making rootfs ...')
-    install_rpms(dest_dir, pkg_list, verbose)
+    install_rpms(dest_dir, pkg_list, repo_file, rootfs_repo_dir, verbose)
     prepare_init_script(base_dir, dest_dir)
     confg_rootfs(dest_dir, config_options)
     print('Copressing rootfs ...')

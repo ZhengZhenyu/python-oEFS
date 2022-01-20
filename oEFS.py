@@ -63,7 +63,7 @@ def prepare_workspace(base_dir, parsed_args, config_options):
     clean_up_dir(rootfs_dir)
     os.makedirs(iso_base_dir)
 
-    return rootfs_dir, config_options['working_dir'], iso_base_dir, packages, verbose
+    return rootfs_dir, config_options['working_dir'], iso_base_dir, packages, repo_file, rootfs_repo_dir, verbose
 
 
 if __name__ == '__main__':
@@ -74,8 +74,10 @@ if __name__ == '__main__':
         config_options = yaml.load(config_file, Loader=yaml.SafeLoader)
 
     base_dir = os.getcwd()
-    rootfs_dir, work_dir, iso_base, packages, verbose = prepare_workspace(base_dir, parsed_args, config_options)
-    rootfs_worker.make_rootfs(rootfs_dir, work_dir, packages, base_dir, config_options, verbose)
+    rootfs_dir, work_dir, iso_base, packages, repo_file, rootfs_repo_dir, verbose = prepare_workspace(
+        base_dir, parsed_args, config_options)
+    rootfs_worker.make_rootfs(
+        rootfs_dir, work_dir, packages, base_dir, config_options, repo_file, rootfs_repo_dir, verbose)
     iso_worker.make_iso(iso_base, base_dir)
 
     print('ISO: openEuler-test.iso generated in:', work_dir)
