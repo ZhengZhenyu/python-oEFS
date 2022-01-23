@@ -86,6 +86,7 @@
     "selinux-policy-mls",
     "openEuler-repos",
     "openEuler-release",
-    "openEuler-gpg-keys"
+    "openEuler-gpg-keys",
+    "kernel"
   ]
 }

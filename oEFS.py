@@ -19,6 +19,10 @@ parser.add_argument('--package-list', metavar='<package_list>',
 parser.add_argument('--config-file', metavar='<config_file>',
                     dest='config_file', required=True,
                     help='Configuration file for the software, including working dir, number of workers etc.')
+parser.add_argument('--build-type', metavar='<config_file>',
+                    dest='build_type', required=True,
+                    help='Specify the build type, should be one of: vhd, livecd-iso, installer-iso')
+
 
 
 def parse_package_list(list_file):
@@ -70,6 +74,13 @@ if __name__ == '__main__':
     start_time = time.time()
     # parse config options and args
     parsed_args = parser.parse_args()
+
+    if parsed_args.build_type not in ['vhd', 'livecd-iso', 'installer-iso']:
+        print('Unsupported build-type, Stopped ...')
+        sys.exit(1)
+    else:
+        print('Building:', parsed_args.build_type)
+
     with open(parsed_args.config_file, 'r') as config_file:
         config_options = yaml.load(config_file, Loader=yaml.SafeLoader)
 

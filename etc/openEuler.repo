@@ -9,42 +9,42 @@
 
 [OS]
 name=OS
-baseurl=http://repo.openeuler.org/openEuler-21.09/OS/$basearch/
+baseurl=http://repo.openeuler.org/openEuler-21.03/OS/$basearch/
 enabled=1
 gpgcheck=1
-gpgkey=http://repo.openeuler.org/openEuler-21.09/OS/$basearch/RPM-GPG-KEY-openEuler
+gpgkey=http://repo.openeuler.org/openEuler-21.03/OS/$basearch/RPM-GPG-KEY-openEuler
 
 [everything]
 name=everything
-baseurl=http://repo.openeuler.org/openEuler-21.09/everything/$basearch/
+baseurl=http://repo.openeuler.org/openEuler-21.03/everything/$basearch/
 enabled=1
 gpgcheck=1
-gpgkey=http://repo.openeuler.org/openEuler-21.09/everything/$basearch/RPM-GPG-KEY-openEuler
+gpgkey=http://repo.openeuler.org/openEuler-21.03/everything/$basearch/RPM-GPG-KEY-openEuler
 
 [EPOL]
 name=EPOL
-baseurl=http://repo.openeuler.org/openEuler-21.09/EPOL/main/$basearch/
+baseurl=http://repo.openeuler.org/openEuler-21.03/EPOL/$basearch/
 enabled=1
 gpgcheck=1
-gpgkey=http://repo.openeuler.org/openEuler-21.09/OS/$basearch/RPM-GPG-KEY-openEuler
+gpgkey=http://repo.openeuler.org/openEuler-21.03/OS/$basearch/RPM-GPG-KEY-openEuler
 
 [debuginfo]
 name=debuginfo
-baseurl=http://repo.openeuler.org/openEuler-21.09/debuginfo/$basearch/
+baseurl=http://repo.openeuler.org/openEuler-21.03/debuginfo/$basearch/
 enabled=1
 gpgcheck=1
-gpgkey=http://repo.openeuler.org/openEuler-21.09/debuginfo/$basearch/RPM-GPG-KEY-openEuler
+gpgkey=http://repo.openeuler.org/openEuler-21.03/debuginfo/$basearch/RPM-GPG-KEY-openEuler
 
 [source]
 name=source
-baseurl=http://repo.openeuler.org/openEuler-21.09/source/
+baseurl=http://repo.openeuler.org/openEuler-21.03/source/
 enabled=1
 gpgcheck=1
-gpgkey=http://repo.openeuler.org/openEuler-21.09/source/RPM-GPG-KEY-openEuler
+gpgkey=http://repo.openeuler.org/openEuler-21.03/source/RPM-GPG-KEY-openEuler
 
 [update]
 name=update
-baseurl=http://repo.openeuler.org/openEuler-21.09/update/$basearch/
+baseurl=http://repo.openeuler.org/openEuler-21.03/update/$basearch/
 enabled=1
 gpgcheck=1
-gpgkey=http://repo.openeuler.org/openEuler-21.09/OS/$basearch/RPM-GPG-KEY-openEuler
+gpgkey=http://repo.openeuler.org/openEuler-21.03/OS/$basearch/RPM-GPG-KEY-openEuler
